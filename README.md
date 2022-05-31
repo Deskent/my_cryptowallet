@@ -1,2 +1,1 @@
-# my_cryptowallet
-my_cryptowallet
+Based on bitcoinlib.
