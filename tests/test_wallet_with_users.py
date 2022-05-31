@@ -10,9 +10,7 @@ async def test_get_address_for_new_user():
         pass
     wallet: 'CryptoWallet' = await CryptoWallet(wallet_name=wallet_name, owner=telegram_id).get_wallet()
     passphrase = wallet.passphrase
-    print(passphrase)
-    wallet_data: dict = await wallet.info()
-    print(wallet_data)
+    wallet_data = await CryptoWallet(wallet_name=wallet_name, owner=telegram_id, passphrase=passphrase).info()
     assert wallet_data
 """
 wallet_data: dict = {
