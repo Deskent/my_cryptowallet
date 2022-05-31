@@ -6,9 +6,10 @@ import bitcoinlib
 from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransaction
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
-from myloguru.my_loguru import logger
-
+import logging
 from .exceptions import PassphraseError
+
+logger = logging.getLogger("my_crypto_wallet")
 
 
 def load_wallet_data(func: Callable) -> Callable:
@@ -205,14 +206,15 @@ class CryptoWallet:
             address: str = self._main_wallet
         try:
             transaction = await self.__send_money(amount=amount, address=address)
-            logger.success(f"Status: {transaction.status}")
+            logger.info(f"Status: {transaction.status}")
             result = transaction.as_dict()
-            logger.success(result)
+            logger.info(result)
             return True
         except WalletError as err:
-            logger.error(f"Send money error: "
-                        f"\nWallet name: {self._wallet_name}\tSending: {amount} to {self._main_wallet}"
-                        f"\nError: {err}")
+            logger.error(
+                f"Send money error: "
+                f"\nWallet name: {self._wallet_name}\tSending: {amount} to {self._main_wallet}"
+                f"\nError: {err}")
         except bitcoinlib.encoding.EncodingError as err:
             logger.error(f"MAIN WALLET ERROR: {err}")
         except bitcoinlib.transactions.TransactionError as err:

@@ -2,12 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='mycryptowallet-deskent',
-    version='0.0.2',
+    version='0.0.3',
     author='Deskent',
     author_email='battenetciz@gmail.com',
     description='My Crypt Wallet library',
     install_requires=[
-        'myloguru-deskent',
         'bitcoinlib==0.6.4',
         'pytest-aio==1.4.1',
     ],
