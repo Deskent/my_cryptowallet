@@ -1,3 +1,8 @@
+"""
+Version 0.0.4
+Author: Deskent
+"""
+
 from decimal import Decimal
 from functools import wraps
 from typing import Optional, Callable, Any
@@ -6,10 +11,11 @@ import bitcoinlib
 from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransaction
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
-import logging
 from .exceptions import PassphraseError
+from myloguru.my_loguru import get_logger
 
-logger = logging.getLogger("my_crypto_wallet")
+
+logger = get_logger()
 
 
 def load_wallet_data(func: Callable) -> Callable:
