@@ -1,6 +1,6 @@
 name: My_Crypto_Wallet
 env:
-  VERSION: "0.0.4"
+  VERSION: "0.0.5"
 
 on:
   push:

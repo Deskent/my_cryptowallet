@@ -1,5 +1,5 @@
 """
-Version 0.0.4
+Version 0.0.5
 Author: Deskent
 """
 
@@ -11,11 +11,11 @@ import bitcoinlib
 from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransaction
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
-from .exceptions import PassphraseError
+from .exceptions import PassphraseError, WalletExists
 from myloguru.my_loguru import get_logger
 
 
-logger = get_logger()
+logger = get_logger(level=20)
 
 
 def load_wallet_data(func: Callable) -> Callable:
@@ -38,6 +38,13 @@ class CryptoWallet:
     """
     Crypto wallet manager
 
+    Attributes:
+        wallet_name: str - Wallet name
+        passphrase: str - Passphrase for get wallet
+        main_wallet: str - Wallet address for transfer money in send_money method
+        network: str - Crypo network
+        fee: Decimal - Fee for transfer
+
     Methods:
         get_wallet
         get_wallet_address
@@ -53,17 +60,13 @@ class CryptoWallet:
             passphrase: str = '',
             main_wallet: str = '',
             network: str = 'litecoin',
-            owner: str = '',
             fee: Decimal = Decimal(0.0015),
-            dir_path: str = ''
     ) -> None:
         self._network = network
         self._wallet_name: str = wallet_name
         self._passphrase: str = passphrase
         self._wallet: Optional['Wallet'] = None
-        self._owner: str = owner
         self._wallet_id: int = 0
-        self._dir_path: str = dir_path
         self._main_wallet: str = main_wallet
         self._fee: Decimal = fee
 
@@ -71,12 +74,12 @@ class CryptoWallet:
         passphrase: str = Mnemonic().generate()
         try:
             self._wallet: 'Wallet' = Wallet.create(
-                self._wallet_name, keys=self._passphrase, network=self._network, owner=self._owner)
+                self._wallet_name, keys=self._passphrase, network=self._network)
             logger.debug(f"Wallet created with name: [{self._wallet_name}]")
             self._passphrase = passphrase
         except WalletError:
             logger.debug(f"Wallet with name [{self._wallet_name}] already exists.")
-
+            raise WalletExists
         return self
 
     async def get_wallet(self) -> 'CryptoWallet':
@@ -115,6 +118,7 @@ class CryptoWallet:
             return Wallet(wallet=self._wallet_name, main_key_object=hd_key.private_hex)
         except WalletError as err:
             logger.error(f"Passphrase error: {err}")
+            raise PassphraseError
 
     @load_wallet_data
     async def get_wallet_address(self) -> str:
@@ -167,8 +171,6 @@ class CryptoWallet:
 
             "name": wallet_name,
 
-            "owner": wallet_owner,
-
             "passphrase": wallet_passphrase,
 
             "address": wallet_address,
@@ -189,7 +191,6 @@ class CryptoWallet:
         data_for_save = {
             "wallet_id": wallet_data.get("wallet_id"),
             "name": wallet_data.get("name"),
-            "owner": wallet_data.get("owner"),
             "passphrase": self._passphrase,
             "address": address,
             "main_network": wallet_data.get("main_network"),
@@ -250,23 +251,20 @@ class CryptoWallet:
         return self._wallet
 
     @property
-    def main_wallet(self) -> str:
-        return self._main_wallet
-
-    @property
     def fee(self) -> Decimal:
         return self._fee
 
     @property
-    def dir_path(self) -> str:
-        return self._dir_path
-
-    @property
     def passphrase(self) -> str:
         return self._passphrase
+
+    @property
+    def main_wallet(self) -> str:
+        return self._main_wallet
 
     @main_wallet.setter
     def main_wallet(self, value: str) -> None:
         if not isinstance(value, str):
             raise ValueError(f"Main wallet must be str, {type(value)} got.")
         self._main_wallet = value
+
