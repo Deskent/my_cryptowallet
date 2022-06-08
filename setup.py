@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mycryptowallet-deskent',
-    version='0.0.8',
+    version='0.0.9',
     author='Deskent',
     author_email='battenetciz@gmail.com',
     description='My Crypt Wallet library',
