@@ -1,2 +1,2 @@
 from .crypto_wallet import CryptoWallet
-from .exceptions import PassphraseError
+from .exceptions import PassphraseError, WalletExists
