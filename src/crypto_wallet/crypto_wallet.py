@@ -1,5 +1,5 @@
 """
-Version 0.0.7
+Version 0.0.8
 Author: Deskent
 """
 
@@ -11,7 +11,7 @@ import bitcoinlib
 from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransaction
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
-from exceptions import PassphraseError, WalletExists
+from .exceptions import PassphraseError, WalletExists
 from myloguru.my_loguru import get_logger
 
 
