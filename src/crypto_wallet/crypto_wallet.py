@@ -1,5 +1,5 @@
 """
-Version 0.0.10
+Version 0.0.11
 Author: Deskent
 """
 
@@ -11,11 +11,20 @@ import bitcoinlib
 from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransaction
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
-from crypto_wallet.exceptions import PassphraseError, WalletExists
 from myloguru.my_loguru import get_logger
 
 
 logger = get_logger(level=20)
+
+
+class PassphraseError(Exception):
+    def __str__(self):
+        return "Wrong passphrase"
+
+
+class WalletExists(Exception):
+    def __str__(self):
+        return "Wallet exists"
 
 
 def load_wallet_data(func: Callable) -> Callable:
