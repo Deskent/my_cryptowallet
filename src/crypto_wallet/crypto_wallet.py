@@ -1,9 +1,9 @@
 """
-Version 0.0.12
+Version 0.0.13
 Author: Deskent
 """
 
-from decimal import Decimal
+from decimal import Decimal, getcontext
 from functools import wraps
 from typing import Optional, Callable, Any
 
@@ -13,7 +13,7 @@ from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
 from myloguru.my_loguru import get_logger
 
-
+getcontext().prec = 5
 logger = get_logger(level=20)
 
 
