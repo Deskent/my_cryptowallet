@@ -1,5 +1,5 @@
 """
-Version 0.0.13
+Version 0.0.14
 Author: Deskent
 """
 
@@ -152,22 +152,15 @@ class CryptoWallet:
         return balance
 
     @load_wallet_data
-    async def get_wallet_balance_with_fee(self) -> str:
+    async def get_wallet_balance_str(self) -> str:
         """Returns balance in string format.
 
         Example: '0.0001235 LTC'
         """
-
-        logger.debug(f"Wallet name: {self._wallet_name}:\tScanning")
         self._wallet.scan()
-        balance, currency = self._wallet.balance(as_string=True).split()
-        balance: 'Decimal' = Decimal(balance) - self._get_fee()
-        if balance < 0:
-            balance = Decimal(0)
-        balance: str = str(balance) + ' ' + currency
+        balance: str = self._wallet.balance(network=self._network, as_string=True)
 
-        logger.debug(f"Wallet name: {self._wallet_name}\tBalance with fee: {balance}")
-
+        logger.debug(f"Wallet with name: {self._wallet_name}\tBalance: {balance}")
         return balance
 
     @load_wallet_data
@@ -176,19 +169,19 @@ class CryptoWallet:
         Returns dictionary wallet data:
 
         {
-            "wallet_id": wallet_id,
+            "wallet_id": wallet_id:, - int
 
-            "name": wallet_name,
+            "name": wallet_name, - str
 
-            "passphrase": wallet_passphrase,
+            "passphrase": wallet_passphrase, - str
 
-            "address": wallet_address,
+            "address": wallet_address, - str
 
-            "main_network": wallet_main_network,
+            "main_network": wallet_main_network, - str
 
-            "main_balance": wallet_main_balance,
+            "main_balance": wallet_main_balance, - int
 
-            "main_balance_str": wallet_main_balance_str,
+            "main_balance_str": wallet_main_balance_str, - str
 
         }
 
@@ -208,24 +201,35 @@ class CryptoWallet:
         }
         return data_for_save
 
+    async def _cost_with_fee(self, amount: str) -> str:
+        """Returns price in string format with fee.
+
+        Example: '0.0001235 LTC'
+        """
+        cost, currency = amount.split()
+        cost: 'Decimal' = Decimal(cost) - self._get_fee()
+        if cost < 0:
+            cost = Decimal(0)
+        cost: str = str(cost) + ' ' + currency
+
+        return cost
+
     @load_wallet_data
-    async def send_money(self, amount: str = '', address: str = '') -> bool:
+    async def send_money(self, amount: str, address: str) -> dict:
         """Sends money to address, by default all money will be sent
 
         :param amount: String format. For example: '0.0015544 LTC'
         :param address: String target address
         :return: bool: Success result
         """
-        if not amount:
-            amount: str = await self.get_wallet_balance_with_fee()
-        if not address:
-            address: str = self._main_wallet
+
+        amount: str = await self._cost_with_fee(amount)
         try:
             transaction = await self.__send_money(amount=amount, address=address)
             logger.info(f"Status: {transaction.status}")
             result = transaction.as_dict()
             logger.info(result)
-            return True
+            return result
         except WalletError as err:
             logger.error(
                 f"Send money error: "
@@ -236,7 +240,7 @@ class CryptoWallet:
         except bitcoinlib.transactions.TransactionError as err:
             logger.error(f"Transaction ERROR: {err}")
 
-        return False
+        return {}
 
     async def __send_money(self, amount: str, address: str) -> WalletTransaction:
         logger.debug(f"Wallet name: {self._wallet_name}\tSending: {amount} to {self._main_wallet}")
