@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from src.crypto_wallet.crypto_wallet import CryptoWallet, WalletError, wallet_delete
+from crypto_wallet.crypto_wallet import CryptoWallet, WalletError, wallet_delete
 
 
 async def test_delete_before_testing_error(wallet_test_name):
@@ -35,7 +35,7 @@ async def test_get_wallet_right_passphrase(wallet_for_test, wallet_test_name):
 
 
 async def test_send_money_zero_balance_error(wallet_for_test, main_wallet):
-    balance_str: str = await wallet_for_test.get_wallet_balance_with_fee()
+    balance_str: str = await wallet_for_test.get_wallet_balance_str()
     assert not await wallet_for_test.send_money(amount=balance_str, address=main_wallet)
 
 
@@ -57,7 +57,7 @@ async def test_get_wallet_balance(wallet_for_test):
 
 
 async def test_get_wallet_balance_with_fee(wallet_for_test):
-    balance: str = await wallet_for_test.get_wallet_balance_with_fee()
+    balance: str = await wallet_for_test.get_wallet_balance_str()
     assert isinstance(balance, str)
 
 
@@ -68,14 +68,12 @@ async def test_get_wallet_address(wallet_for_test):
 
 async def test_delete_wallet(wallet_for_test):
     await wallet_for_test.load_data()
-    result = await wallet_for_test.delete_wallet()
-    assert result == True
+    assert await wallet_for_test.delete_wallet() is True
 
 
 async def test_delete_wallet_not_exists(wallet_for_test):
-    result = await wallet_for_test.delete_wallet()
-    assert result == False
+    assert await wallet_for_test.delete_wallet() is False
 
 
 def test_delete_file(wallet_test_name):
-    assert os.system(f"rm {wallet_test_name}.txt")
+    assert os.system(f"rm {wallet_test_name}.txt") == 0

@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
-
+exec(open("src/crypto_wallet/_resources.py").read())
 setup(
-    name='mycryptowallet-deskent',
-    version='0.0.14',
-    author='Deskent',
+    name=__package_name__,
+    version=__version__,
+    author=__author__,
     author_email='battenetciz@gmail.com',
-    description='My Crypt Wallet library',
+    description='My Crypto Wallet library',
     install_requires=[
         'bitcoinlib==0.6.4',
-        'myloguru-deskent'
+        'myloguru-deskent==0.0.12'
     ],
     scripts=['src/crypto_wallet/crypto_wallet.py'],
     classifiers=[
