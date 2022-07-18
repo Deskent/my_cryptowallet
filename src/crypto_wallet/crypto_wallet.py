@@ -1,8 +1,4 @@
-"""
-Version 0.0.14
-Author: Deskent
-"""
-
+# -*- coding: UTF-8 -*-
 from decimal import Decimal, getcontext
 from functools import wraps
 from typing import Optional, Callable, Any
@@ -12,19 +8,10 @@ from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransac
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
 from myloguru.my_loguru import get_logger
+from crypto_wallet.exceptions import WalletExists, PassphraseError
 
 getcontext().prec = 5
 logger = get_logger(level=20)
-
-
-class PassphraseError(Exception):
-    def __str__(self):
-        return "Wrong passphrase"
-
-
-class WalletExists(Exception):
-    def __str__(self):
-        return "Wallet exists"
 
 
 def load_wallet_data(func: Callable) -> Callable:
@@ -45,21 +32,37 @@ def load_wallet_data(func: Callable) -> Callable:
 
 class CryptoWallet:
     """
-    Crypto wallet manager
+    Crypto wallet manager.
+    Create or get crypto wallet by name and passphrase.
+    Get balance, address and wallet info.
+    Transfer money to another wallet by address.
 
-    Attributes:
+    Attributes
         wallet_name: str - Wallet name
-        passphrase: str - Passphrase for get wallet
-        main_wallet: str - Wallet address for transfer money in send_money method
-        network: str - Crypo network
-        fee: Decimal - Fee for transfer
 
-    Methods:
+        passphrase: str = ''
+            Passphrase for get wallet
+
+        main_wallet: str = ''
+            Wallet address for transfer money in send_money method
+
+        network: str = 'litecoin'
+            Crypto network
+
+        fee: Decimal = Decimal(0.0015)
+            Fee for transfer
+
+    Methods
         get_wallet
+
         get_wallet_address
+
         get_wallet_balance
-        get_wallet_balance_with_fee
+
+        get_wallet_balance_str
+
         send_money
+
         info
     """
 
@@ -79,6 +82,9 @@ class CryptoWallet:
         self._main_wallet: str = main_wallet
         self._fee: Decimal = fee
 
+    async def get_wallet(self) -> 'CryptoWallet':
+        return await self._get_or_create_wallet()
+
     async def _create_new_wallet(self) -> 'CryptoWallet':
         passphrase: str = Mnemonic().generate()
         try:
@@ -91,13 +97,8 @@ class CryptoWallet:
             raise WalletExists
         return self
 
-    async def get_wallet(self) -> 'CryptoWallet':
-        return await self._get_or_create_wallet()
-
     def _get_fee(self) -> 'Decimal':
-        if self._network == 'litecoin':
-            return Decimal(self.fee)
-        return Decimal(0)
+        return self.fee
 
     async def load_data(self) -> 'CryptoWallet':
         """Returns CryptoWallet instance contains Wallet data loaded from passphrase
@@ -225,10 +226,12 @@ class CryptoWallet:
 
         amount: str = await self._cost_with_fee(amount)
         try:
-            transaction = await self.__send_money(amount=amount, address=address)
-            logger.info(f"Status: {transaction.status}")
-            result = transaction.as_dict()
-            logger.info(result)
+            transaction: 'WalletTransaction' = await self.__send_money(
+                amount=amount, address=address)
+            result: dict = transaction.as_dict()
+            logger.info(f"Status: {transaction.status}"
+                        f"\nResult: {result}")
+
             return result
         except WalletError as err:
             logger.error(
@@ -265,7 +268,7 @@ class CryptoWallet:
 
     @property
     def fee(self) -> Decimal:
-        return self._fee
+        return Decimal(self._fee)
 
     @property
     def passphrase(self) -> str:
@@ -278,6 +281,5 @@ class CryptoWallet:
     @main_wallet.setter
     def main_wallet(self, value: str) -> None:
         if not isinstance(value, str):
-            raise ValueError(f"Main wallet must be str, {type(value)} got.")
+            raise TypeError(f"Main wallet must be str, {type(value)} got.")
         self._main_wallet = value
-

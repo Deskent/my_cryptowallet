@@ -1,4 +1,6 @@
 build==0.8.0
-pytest==7.1.2
+bitcoinlib==0.6.4
+pytest-aio==1.4.1
 twine==4.0.0
-myloguru-deskent
+
+myloguru-deskent==0.0.12
