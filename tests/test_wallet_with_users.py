@@ -1,4 +1,4 @@
-from crypto_wallet.crypto_wallet import CryptoWallet, wallet_delete
+from crypto_wallet.wallet import CryptoWallet, wallet_delete
 
 
 async def test_get_address_for_new_user():
