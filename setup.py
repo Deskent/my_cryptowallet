@@ -10,7 +10,7 @@ setup(
         'bitcoinlib==0.6.4',
         'myloguru-deskent==0.0.12'
     ],
-    scripts=['src/crypto_wallet/crypto_wallet.py'],
+    scripts=['src/crypto_wallet/wallet.py'],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
