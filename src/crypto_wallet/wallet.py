@@ -8,7 +8,7 @@ from bitcoinlib.wallets import Wallet, wallet_delete, WalletError, WalletTransac
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.keys import HDKey
 from myloguru.my_loguru import get_logger
-from crypto_wallet import WalletExists, PassphraseError
+from crypto_wallet.exceptions import WalletExists, PassphraseError
 
 getcontext().prec = 5
 logger = get_logger(level=20)
