@@ -2,7 +2,7 @@ import os.path
 
 import pytest
 
-from crypto_wallet.crypto_wallet import CryptoWallet
+from crypto_wallet import CryptoWallet
 
 
 @pytest.fixture(scope='session')

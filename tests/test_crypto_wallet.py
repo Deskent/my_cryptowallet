@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from crypto_wallet.crypto_wallet import CryptoWallet, WalletError, wallet_delete
+from crypto_wallet.wallet import CryptoWallet, WalletError, wallet_delete
 
 
 async def test_delete_before_testing_error(wallet_test_name):
@@ -45,7 +45,7 @@ async def test_get_wallet_from_passphrase(wallet_for_test, wallet_test_name, loa
 
 
 @pytest.mark.parametrize('network, fee', [("litecoin", Decimal(0.0015)),
-                                          ('bitcoin', 0)])
+                                          ])
 async def test_get_fee(network, fee, wallet_for_test):
     wallet_for_test._network = network
     assert wallet_for_test._get_fee() == fee
